@@ -5,17 +5,22 @@ services:
   ccapp:
     image: modelit-codex-ccapp:latest
     container_name: sbml-ccapp
+    command: python3 manage.py runserver 0.0.0.0:8080
     ports:
       - "8082:8080"
     environment:
+      - CC_ENVIRONMENT=development      # Django ALLOWED_HOSTS configuration
+      - CC_HOST_APP_PORT=8080           # Internal Django port
+      - CC_HOST_CLIENT_PORT=5001        # Client-facing API port
       - AUTH_ENABLED=false              # NO LOGIN REQUIRED
       - AUTO_LOGIN=true                 # AUTO LOGIN IF NEEDED
       - DEFAULT_USER=builder            # DEFAULT USER
       - SESSION_TIMEOUT=never           # NEVER EXPIRE
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=sbml_models
-      - DB_USER=sbml
+      - POSTGRES_HOST=db                # Database connection (Django expects POSTGRES_*)
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=sbml_models
+      - POSTGRES_USER=sbml
+      - POSTGRES_PASSWORD=                # Empty password (trust auth mode)
       - APP_URL=http://app:8081         # Connect to Java simulation engine
     depends_on:
       - db
