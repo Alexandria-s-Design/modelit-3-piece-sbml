@@ -1,0 +1,105 @@
+{
+  "name": "Cell Cycle Model",
+  "description": "Basic cell cycle regulation with cyclin-CDK dynamics",
+  "components": [
+    {
+      "id": "CyclinE",
+      "name": "Cyclin E",
+      "type": "protein",
+      "initial_value": 0.1,
+      "degradation_rate": 0.05
+    },
+    {
+      "id": "CDK2",
+      "name": "Cyclin-Dependent Kinase 2",
+      "type": "protein",
+      "initial_value": 1.0,
+      "degradation_rate": 0.001
+    },
+    {
+      "id": "CyclinE_CDK2",
+      "name": "Cyclin E-CDK2 Complex",
+      "type": "complex",
+      "initial_value": 0.0
+    },
+    {
+      "id": "E2F",
+      "name": "E2F Transcription Factor",
+      "type": "protein",
+      "initial_value": 0.5,
+      "degradation_rate": 0.01
+    },
+    {
+      "id": "Rb",
+      "name": "Retinoblastoma Protein",
+      "type": "protein",
+      "initial_value": 1.0,
+      "degradation_rate": 0.001
+    },
+    {
+      "id": "Rb_P",
+      "name": "Phosphorylated Rb",
+      "type": "protein",
+      "initial_value": 0.0,
+      "degradation_rate": 0.001
+    }
+  ],
+  "interactions": [
+    {
+      "source": "CyclinE",
+      "target": "CDK2",
+      "type": "binding",
+      "forward_rate": 1.0,
+      "reverse_rate": 0.1,
+      "product": "CyclinE_CDK2"
+    },
+    {
+      "source": "CyclinE_CDK2",
+      "target": "Rb",
+      "type": "phosphorylation",
+      "rate": 0.5,
+      "product": "Rb_P"
+    },
+    {
+      "source": "Rb",
+      "target": "E2F",
+      "type": "inhibition",
+      "rate": 0.8,
+      "hill_coefficient": 1,
+      "half_activation": 0.5
+    },
+    {
+      "source": "E2F",
+      "target": "CyclinE",
+      "type": "activation",
+      "rate": 0.3,
+      "hill_coefficient": 2,
+      "half_activation": 0.2
+    },
+    {
+      "source": "CyclinE_CDK2",
+      "target": "E2F",
+      "type": "activation",
+      "rate": 0.1,
+      "hill_coefficient": 1,
+      "half_activation": 0.1
+    }
+  ],
+  "parameters": {
+    "cyclin_synthesis": 0.1,
+    "cdk_synthesis": 0.01,
+    "e2f_synthesis": 0.02,
+    "rb_synthesis": 0.01,
+    "cyclin_degradation": 0.05,
+    "rb_dephosphorylation": 0.02
+  },
+  "simulation_config": {
+    "method": "java-advanced",
+    "steps": 500,
+    "t_start": 0.0,
+    "t_end": 2000.0,
+    "tolerance": 1e-6,
+    "max_step": 1.0
+  },
+  "notes": "This model captures the G1/S transition in the cell cycle. Cyclin E-CDK2 phosphorylates Rb, releasing E2F which activates cyclin E transcription creating a positive feedback loop. This drives cells irreversibly into S phase."
+}

@@ -1,0 +1,67 @@
+{
+  "name": "Repressilator",
+  "description": "The classic synthetic genetic oscillator - three genes repressing each other in a cycle",
+  "components": [
+    {
+      "id": "TetR",
+      "name": "TetR Repressor",
+      "type": "protein",
+      "initial_value": 10.0,
+      "degradation_rate": 0.01
+    },
+    {
+      "id": "LacI",
+      "name": "LacI Repressor",
+      "type": "protein",
+      "initial_value": 0.0,
+      "degradation_rate": 0.01
+    },
+    {
+      "id": "cI",
+      "name": "Lambda cI Repressor",
+      "type": "protein",
+      "initial_value": 0.0,
+      "degradation_rate": 0.01
+    }
+  ],
+  "interactions": [
+    {
+      "source": "TetR",
+      "target": "LacI",
+      "type": "inhibition",
+      "rate": 0.2,
+      "hill_coefficient": 2,
+      "half_activation": 10.0
+    },
+    {
+      "source": "LacI",
+      "target": "cI",
+      "type": "inhibition",
+      "rate": 0.2,
+      "hill_coefficient": 2,
+      "half_activation": 10.0
+    },
+    {
+      "source": "cI",
+      "target": "TetR",
+      "type": "inhibition",
+      "rate": 0.2,
+      "hill_coefficient": 2,
+      "half_activation": 10.0
+    }
+  ],
+  "parameters": {
+    "production_rate": 5.0,
+    "degradation_rate": 0.01,
+    "hill_coefficient": 2,
+    "repression_threshold": 10.0
+  },
+  "simulation_config": {
+    "method": "java-advanced",
+    "steps": 500,
+    "t_start": 0.0,
+    "t_end": 1000.0,
+    "tolerance": 1e-6
+  },
+  "notes": "The repressilator was one of the first synthetic genetic circuits, demonstrating that oscillations can be engineered in living cells. Each protein represses the next in a ring, creating sustained oscillations. Published by Elowitz & Leibler in Nature 2000."
+}

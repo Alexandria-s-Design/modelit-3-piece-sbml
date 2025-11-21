@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBML Builder - Zero Auth Edition</title>
+
+    <!-- NO LOGIN FORM -->
+    <!-- NO AUTH CHECKS -->
+    <!-- DIRECT ACCESS TO ALL FEATURES -->
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- External Libraries (CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/cytoscape@3.27.0/dist/cytoscape.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- NO LOGIN SCREEN -->
+    <!-- DIRECT TO BUILDER -->
+
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row bg-primary text-white p-3">
+            <div class="col">
+                <h1>🔬 SBML Model Builder</h1>
+                <p class="mb-0">Zero Authentication | Full Access | Offline Capable</p>
+            </div>
+            <div class="col-auto">
+                <div class="badge bg-success">🔓 NO LOGIN REQUIRED</div>
+            </div>
+        </div>
+
+        <!-- Main Content (3-Panel Layout) -->
+        <div class="row g-0" style="height: calc(100vh - 80px);">
+            <!-- Left Panel: Component Library & Tools -->
+            <div class="col-md-3 border-end p-3" style="overflow-y: auto;">
+                <h4>📦 Components</h4>
+
+                <!-- Model Info -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6>Current Model</h6>
+                        <input type="text" id="modelName" class="form-control mb-2" placeholder="Model Name" value="My SBML Model">
+                        <textarea id="modelDescription" class="form-control mb-2" placeholder="Description" rows="2"></textarea>
+                        <button class="btn btn-sm btn-primary w-100" onclick="saveModel()">💾 Save Model</button>
+                    </div>
+                </div>
+
+                <!-- Add Component -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6>Add Component</h6>
+                        <input type="text" id="componentName" class="form-control mb-2" placeholder="Component Name">
+                        <select id="componentType" class="form-select mb-2">
+                            <option value="species">Species (Protein)</option>
+                            <option value="reaction">Reaction</option>
+                            <option value="parameter">Parameter</option>
+                            <option value="compartment">Compartment</option>
+                        </select>
+                        <button class="btn btn-sm btn-success w-100" onclick="addComponent()">➕ Add Component</button>
+                    </div>
+                </div>
+
+                <!-- Add Interaction -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6>Add Interaction</h6>
+                        <select id="sourceComponent" class="form-select mb-2">
+                            <option value="">Select Source</option>
+                        </select>
+                        <select id="targetComponent" class="form-select mb-2">
+                            <option value="">Select Target</option>
+                        </select>
+                        <select id="interactionType" class="form-select mb-2">
+                            <option value="activation">→ Activation</option>
+                            <option value="inhibition">⊣ Inhibition</option>
+                            <option value="catalysis">⇒ Catalysis</option>
+                        </select>
+                        <button class="btn btn-sm btn-info w-100" onclick="addInteraction()">🔗 Add Interaction</button>
+                    </div>
+                </div>
+
+                <!-- Component List -->
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Component List</h6>
+                        <ul id="componentList" class="list-group list-group-flush">
+                            <!-- Components will appear here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Panel: Graph Visualization -->
+            <div class="col-md-6 border-end p-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <h4>🔬 Model Graph</h4>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="resetLayout()">↻ Reset Layout</button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="fitGraph()">⊞ Fit</button>
+                    </div>
+                </div>
+                <div id="cy" style="width: 100%; height: 90%; border: 1px solid #ddd;"></div>
+            </div>
+
+            <!-- Right Panel: Simulation & Export -->
+            <div class="col-md-3 p-3" style="overflow-y: auto;">
+                <h4>⚡ Simulation</h4>
+
+                <!-- Simulation Controls -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6>Run Simulation</h6>
+                        <label>Time Steps</label>
+                        <input type="number" id="simSteps" class="form-control mb-2" value="100" min="1">
+
+                        <label>Method</label>
+                        <select id="simMethod" class="form-select mb-3">
+                            <option value="java-advanced">Java (Advanced)</option>
+                            <option value="java-stochastic">Java (Stochastic)</option>
+                            <option value="euler">Euler</option>
+                            <option value="runge-kutta">Runge-Kutta</option>
+                        </select>
+
+                        <button class="btn btn-success w-100 mb-2" onclick="runSimulation()">▶ Run Simulation</button>
+                        <button class="btn btn-warning w-100" onclick="stopSimulation()">⏹ Stop</button>
+                    </div>
+                </div>
+
+                <!-- Simulation Results -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6>Results</h6>
+                        <canvas id="simChart"></canvas>
+                        <div id="simStatus" class="mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="card">
+                    <div class="card-body">
+                        <h6>Export</h6>
+                        <button class="btn btn-sm btn-primary w-100 mb-2" onclick="exportSBML()">📄 Export SBML</button>
+                        <button class="btn btn-sm btn-info w-100 mb-2" onclick="exportCSV()">📊 Export CSV</button>
+                        <button class="btn btn-sm btn-secondary w-100" onclick="exportPNG()">🖼 Export Graph PNG</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/builder.js"></script>
+    <script src="js/graph.js"></script>
+    <script src="js/simulation.js"></script>
+
+    <script>
+        // Initialize on page load - NO LOGIN CHECK
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔓 SBML Builder - Zero Authentication Mode');
+            console.log('✅ NO LOGIN REQUIRED');
+            console.log('✅ DIRECT ACCESS ENABLED');
+
+            // Initialize graph
+            initGraph();
+
+            // Load existing model (if any)
+            loadModel();
+
+            // Show welcome message
+            showNotification('Welcome! Start building your SBML model.', 'success');
+        });
+
+        function showNotification(message, type = 'info') {
+            const statusDiv = document.getElementById('simStatus');
+            statusDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+            setTimeout(() => statusDiv.innerHTML = '', 5000);
+        }
+    </script>
+</body>
+</html>

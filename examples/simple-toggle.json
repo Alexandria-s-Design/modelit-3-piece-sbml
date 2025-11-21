@@ -1,0 +1,52 @@
+{
+  "name": "Simple Toggle Switch",
+  "description": "A genetic toggle switch between two mutually repressing proteins",
+  "components": [
+    {
+      "id": "LacI",
+      "name": "LacI Repressor",
+      "type": "protein",
+      "initial_value": 10.0,
+      "degradation_rate": 0.01
+    },
+    {
+      "id": "TetR",
+      "name": "TetR Repressor",
+      "type": "protein",
+      "initial_value": 0.0,
+      "degradation_rate": 0.01
+    }
+  ],
+  "interactions": [
+    {
+      "source": "LacI",
+      "target": "TetR",
+      "type": "inhibition",
+      "rate": 0.1,
+      "hill_coefficient": 2,
+      "half_activation": 5.0
+    },
+    {
+      "source": "TetR",
+      "target": "LacI",
+      "type": "inhibition",
+      "rate": 0.1,
+      "hill_coefficient": 2,
+      "half_activation": 5.0
+    }
+  ],
+  "parameters": {
+    "production_LacI": 1.0,
+    "production_TetR": 1.0,
+    "degradation_LacI": 0.01,
+    "degradation_TetR": 0.01
+  },
+  "simulation_config": {
+    "method": "java-advanced",
+    "steps": 100,
+    "t_start": 0.0,
+    "t_end": 1000.0,
+    "tolerance": 1e-6
+  },
+  "notes": "This model demonstrates bistability - the system can stably exist in either of two states (LacI high/TetR low or LacI low/TetR high). The initial conditions determine which state the system reaches."
+}

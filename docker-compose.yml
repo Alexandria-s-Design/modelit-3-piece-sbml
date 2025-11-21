@@ -1,0 +1,99 @@
+version: "3.8"
+
+services:
+  # Service 1: SBML Engine (no authentication)
+  ccapp:
+    image: modelit-codex-ccapp:latest
+    container_name: sbml-ccapp
+    ports:
+      - "8082:8080"
+    environment:
+      - AUTH_ENABLED=false              # NO LOGIN REQUIRED
+      - AUTO_LOGIN=true                 # AUTO LOGIN IF NEEDED
+      - DEFAULT_USER=builder            # DEFAULT USER
+      - SESSION_TIMEOUT=never           # NEVER EXPIRE
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=sbml_models
+      - DB_USER=sbml
+      - APP_URL=http://app:8081         # Connect to Java simulation engine
+    depends_on:
+      - db
+      - app
+    networks:
+      - sbml-network
+    restart: unless-stopped
+
+  # Service 2: Java Simulation Engine (no authentication)
+  app:
+    image: modelit-codex-app:latest
+    container_name: sbml-simulator
+    ports:
+      - "8081:8081"
+    environment:
+      - AUTH_ENABLED=false              # NO LOGIN REQUIRED
+      - OPEN_ACCESS=true                # ALLOW ALL REQUESTS
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=sbml_models
+      - DB_USER=sbml
+    depends_on:
+      - db
+    networks:
+      - sbml-network
+    restart: unless-stopped
+
+  # Service 3: PostgreSQL Database (no password)
+  db:
+    image: postgres:13
+    container_name: sbml-database
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust # NO PASSWORD REQUIRED
+      - POSTGRES_DB=sbml_models
+      - POSTGRES_USER=sbml
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - sbml-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sbml"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service 4: Flask API Wrapper + Frontend (no authentication)
+  api:
+    build: ./api
+    container_name: sbml-api
+    ports:
+      - "5001:5000"
+    environment:
+      - CCAPP_URL=http://ccapp:8080     # SBML engine URL
+      - APP_URL=http://app:8081          # Java simulator URL
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=sbml_models
+      - DB_USER=sbml
+      - FLASK_ENV=development
+      - NO_AUTH=true                     # NO AUTHENTICATION FLAG
+    depends_on:
+      - ccapp
+      - app
+      - db
+    volumes:
+      - ./frontend:/app/frontend          # Serve static frontend files
+      - ./api:/app                        # Mount API code for hot reload
+    networks:
+      - sbml-network
+    restart: unless-stopped
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  sbml-network:
+    driver: bridge

@@ -1,0 +1,130 @@
+/* ModelIT 4-Piece SBML Builder - Styles */
+/* Zero Authentication Edition */
+
+:root {
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --info-color: #0dcaf0;
+    --warning-color: #ffc107;
+    --dark-color: #212529;
+    --light-color: #f8f9fa;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
+}
+
+/* NO LOGIN FORM STYLES NEEDED */
+
+/* Graph Styling */
+#cy {
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Component List */
+#componentList {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#componentList li {
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+#componentList li:hover {
+    background: #f8f9fa;
+}
+
+/* Simulation Chart */
+#simChart {
+    max-height: 200px;
+}
+
+/* Status Messages */
+.alert {
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.alert-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.alert-info {
+    background: var(--info-color);
+    color: white;
+}
+
+.alert-warning {
+    background: var(--warning-color);
+    color: #000;
+}
+
+.alert-danger {
+    background: var(--danger-color);
+    color: white;
+}
+
+/* Buttons */
+.btn {
+    transition: all 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Cards */
+.card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+.card-body h6 {
+    color: var(--dark-color);
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .row > div[class^="col-md"] {
+        min-height: 400px;
+    }
+}
+
+/* Badge */
+.badge {
+    font-size: 0.9em;
+    padding: 6px 12px;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
